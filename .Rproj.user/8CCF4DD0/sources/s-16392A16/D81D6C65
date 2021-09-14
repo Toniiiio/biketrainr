@@ -1,0 +1,25 @@
+{
+    "id": "D81D6C65",
+    "path": "~/biketrainr/R/combine_data.R",
+    "project_path": "R/combine_data.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1623005282590.0,
+    "source_on_save": false,
+    "relative_order": 2,
+    "properties": {
+        "tempName": "Untitled1",
+        "cursorPosition": "19,38",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1631166874,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1631166874882,
+    "read_only": false,
+    "read_only_alternatives": []
+}

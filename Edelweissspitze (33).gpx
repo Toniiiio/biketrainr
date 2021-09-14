@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx
+version="1.1"
+creator="OpenTracks"
+xmlns="http://www.topografix.com/GPX/1/1"
+xmlns:topografix="http://www.topografix.com/GPX/Private/TopoGrafix/0/1"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:atom="http://www.w3.org/2005/Atom"
+xmlns:opentracks="http://opentracksapp.com/xmlschemas/v1"
+xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v2"
+xmlns:pwr="http://www.garmin.com/xmlschemas/PowerExtension/v1"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v2 https://www8.garmin.com/xmlschemas/TrackPointExtensionv2.xsd http://www.garmin.com/xmlschemas/PowerExtension/v1 https://www8.garmin.com/xmlschemas/PowerExtensionv1.xsd http://opentracksapp.com/xmlschemas/v1 http://opentracksapp.com/xmlschemas/OpenTracks_v1.xsd">
+<trk>
+<name><![CDATA[2021-06-04 12:34]]></name>
+<desc><![CDATA[]]></desc>
+<type><![CDATA[unbekannt]]></type>
+<extensions>
+<topografix:color>c0c0c0</topografix:color>
+<opentracks:trackid>7510a6a1-2851-4e8e-981e-e4e0325d9507</opentracks:trackid>
+</extensions>
+<trkseg>
+<trkpt lat="47.167065" lon="12.814493">
+<ele>1211.9</ele>
+<time>2021-06-04T10:34:16.861Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>2.19</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="47.167026" lon="12.814537">
+<ele>1201.1</ele>
+<time>2021-06-04T10:34:18.844Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>2.18</gpxtpx:speed>
+<gpxtpx:heart>131</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+	</trkseg>
+</trk>
+</gpx>

@@ -1,0 +1,8 @@
+library(httr)
+url <- "https://www.strava.com/activities/5485017688/streams?stream_types%5B%5D=time&stream_types%5B%5D=watts_calc&stream_types%5B%5D=distance&stream_types%5B%5D=altitude&stream_types%5B%5D=heartrate&stream_types%5B%5D=cadence&stream_types%5B%5D=grade_adjusted_distance&_=1623961174179"
+resp <- url %>% httr::GET()
+
+SteveAI::showHtmlPage(content(resp))
+
+
+library(SteveAI)

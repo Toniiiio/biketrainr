@@ -1,0 +1,69 @@
+
+https://stackoverflow.com/questions/48781380/shiny-how-to-highlight-an-object-on-a-leaflet-map-when-selecting-a-record-in-a
+
+
+library(shiny)
+library(leaflet)
+library(DT)
+
+qDat <- quakes[1:10, ]
+qDat$id <- seq.int(nrow(qDat))
+
+ui <- fluidPage(
+  mainPanel(
+    leafletOutput('map01'),
+    dataTableOutput('table01')
+  )
+)
+
+
+
+server <- function(input,output){
+  
+  output$table01 <- renderDataTable({
+    DT::datatable(qDat, selection = "single", options = list(stateSave = TRUE))
+  })
+  
+  # to keep track of previously selected row
+  prev_row <- reactiveVal()
+  
+  # new icon style
+  highlight_icon = makeAwesomeIcon(icon = 'flag', markerColor = 'green', iconColor = 'white')
+  
+  observeEvent(input$table01_rows_selected, {
+    row_selected = qDat[input$table01_rows_selected, ]
+    proxy <- leafletProxy('map01')
+    proxy %>%
+      addAwesomeMarkers(popup = as.character(row_selected$mag),
+                        layerId = as.character(row_selected$id),
+                        lng = row_selected$long, 
+                        lat = row_selected$lat,
+                        icon = highlight_icon)
+    
+    # Reset previously selected marker
+    if(!is.null(prev_row())){
+      proxy %>%
+        addMarkers(popup = as.character(prev_row()$mag), 
+                   layerId = as.character(prev_row()$id),
+                   lng = prev_row()$long, 
+                   lat = prev_row()$lat)
+    }
+    # set new value to reactiveVal 
+    prev_row(row_selected)
+  })
+  
+  output$map01 <- renderLeaflet({
+    leaflet(data = qDat) %>% 
+      addTiles() %>%
+      addMarkers(popup = ~as.character(mag), layerId = as.character(qDat$id)) 
+  })
+  
+  observeEvent(input$map01_marker_click, {
+    clickId <- input$map01_marker_click$id
+    dataTableProxy("table01") %>%
+      selectRows(which(qDat$id == clickId)) %>%
+      selectPage(which(input$table01_rows_all == clickId) %/% input$table01_state$length + 1)
+  })
+}
+
+shinyApp(ui = ui, server = server)

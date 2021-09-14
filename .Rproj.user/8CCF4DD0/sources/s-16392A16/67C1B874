@@ -1,0 +1,25 @@
+{
+    "id": "67C1B874",
+    "path": "~/biketrainr/R/gen_data.R",
+    "project_path": "R/gen_data.R",
+    "type": "r_source",
+    "hash": "0",
+    "contents": "",
+    "dirty": false,
+    "created": 1631042234320.0,
+    "source_on_save": false,
+    "relative_order": 6,
+    "properties": {
+        "tempName": "Untitled1",
+        "cursorPosition": "14,0",
+        "scrollLine": "0"
+    },
+    "folds": "",
+    "lastKnownWriteTime": 1631219968,
+    "encoding": "UTF-8",
+    "collab_server": "",
+    "source_window": "",
+    "last_content_update": 1631219968474,
+    "read_only": false,
+    "read_only_alternatives": []
+}

@@ -1,0 +1,180 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<gpx
+version="1.1"
+creator="OpenTracks"
+xmlns="http://www.topografix.com/GPX/1/1"
+xmlns:topografix="http://www.topografix.com/GPX/Private/TopoGrafix/0/1"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xmlns:atom="http://www.w3.org/2005/Atom"
+xmlns:opentracks="http://opentracksapp.com/xmlschemas/v1"
+xmlns:gpxtpx="http://www.garmin.com/xmlschemas/TrackPointExtension/v2"
+xmlns:pwr="http://www.garmin.com/xmlschemas/PowerExtension/v1"
+xsi:schemaLocation="http://www.topografix.com/GPX/1/1 http://www.topografix.com/GPX/1/1/gpx.xsd http://www.topografix.com/GPX/Private/TopoGrafix/0/1 http://www.topografix.com/GPX/Private/TopoGrafix/0/1/topografix.xsd http://www.garmin.com/xmlschemas/TrackPointExtension/v2 https://www8.garmin.com/xmlschemas/TrackPointExtensionv2.xsd http://www.garmin.com/xmlschemas/PowerExtension/v1 https://www8.garmin.com/xmlschemas/PowerExtensionv1.xsd http://opentracksapp.com/xmlschemas/v1 http://opentracksapp.com/xmlschemas/OpenTracks_v1.xsd">
+<trk>
+<name><![CDATA[2021-06-18 22:05]]></name>
+<desc><![CDATA[]]></desc>
+<type><![CDATA[unbekannt]]></type>
+<extensions>
+<topografix:color>c0c0c0</topografix:color>
+<opentracks:trackid>8281ddd5-165e-4a74-809a-8ad6833449c8</opentracks:trackid>
+</extensions>
+<trkseg>
+<trkpt lat="50.11732" lon="8.685498">
+<ele>176.3</ele>
+<time>2021-06-18T20:05:18.179Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117327" lon="8.685496">
+<ele>174.9</ele>
+<time>2021-06-18T20:05:19.183Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117311" lon="8.685477">
+<ele>192.3</ele>
+<time>2021-06-18T20:05:42.178Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.11731" lon="8.685476">
+<ele>192.4</ele>
+<time>2021-06-18T20:05:47.253Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.11731" lon="8.685476">
+<ele>193.4</ele>
+<time>2021-06-18T20:05:47.260Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.11731" lon="8.685476">
+<ele>194</ele>
+<time>2021-06-18T20:05:47.265Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.11731" lon="8.685476">
+<ele>194.5</ele>
+<time>2021-06-18T20:05:47.270Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.11731" lon="8.685475">
+<ele>194.8</ele>
+<time>2021-06-18T20:05:47.276Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117311" lon="8.685474">
+<ele>195.3</ele>
+<time>2021-06-18T20:05:48.177Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117311" lon="8.685473">
+<ele>195.2</ele>
+<time>2021-06-18T20:05:49.181Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117312" lon="8.685473">
+<ele>195.4</ele>
+<time>2021-06-18T20:05:50.183Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117312" lon="8.685473">
+<ele>195.9</ele>
+<time>2021-06-18T20:05:51.186Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117313" lon="8.68547">
+<ele>196.1</ele>
+<time>2021-06-18T20:05:52.188Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117312" lon="8.68547">
+<ele>195.9</ele>
+<time>2021-06-18T20:05:53.209Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+<gpxtpx:heart>90</gpxtpx:heart>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+</trkseg>
+<trkseg>
+<trkpt lat="50.117312" lon="8.685468">
+<ele>196</ele>
+<time>2021-06-18T20:05:56.903Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117312" lon="8.685467">
+<ele>196.1</ele>
+<time>2021-06-18T20:05:57.175Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.117312" lon="8.685467">
+<ele>196.2</ele>
+<time>2021-06-18T20:05:58.204Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>0</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+</trkseg>
+<trkseg>
+<trkpt lat="50.118978" lon="8.685368">
+<ele>153.5</ele>
+<time>2021-06-18T20:16:23.181Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>2.84</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.119028" lon="8.685315">
+<ele>155.1</ele>
+<time>2021-06-18T20:16:24.176Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>2.59</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+<trkpt lat="50.119059" lon="8.685282">
+<ele>161.2</ele>
+<time>2021-06-18T20:16:25.202Z</time>
+<extensions><gpxtpx:TrackPointExtension>
+<gpxtpx:speed>2.68</gpxtpx:speed>
+</gpxtpx:TrackPointExtension></extensions>
+</trkpt>
+</trkseg>
+</trk>
+</gpx>
