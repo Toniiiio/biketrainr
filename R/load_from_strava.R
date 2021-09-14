@@ -29,12 +29,19 @@ load_strava <- function(file_name){
   strava_data <- strava_records[[1]]
   nr <- 2
   for(nr in seq(strava_records)[-1]){
-    strava_data <- merge(strava_data, strava_records[[nr]], all = TRUE, by = "timestamp")
+    strava_data <- merge(strava_data, strava_records[[nr]], all = TRUE, by = "timestamp", no.dups = TRUE)
   }
 
+  strava_data %>% head
+  amt_na <- apply(strava_data, 2, function(col) sum(is.na(col))) / dim(strava_data)[1]
+  keep <- which(amt_na < 0.99)
+  strava_data <- strava_data[, keep]
+
   strava_data <- zoo::na.locf(strava_data)
+  names(strava_data) <- gsub(pattern = "[.].*", replacement = "", x = names(strava_data))
+  strava_data %>% head
   strava_data
-  strava_data$power.x
+
   # keep <- strava_records %>%
   #   lapply(dim) %>%
   #   lapply(prod) %>%
