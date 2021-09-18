@@ -25,11 +25,12 @@ week
 week %<>% mutate(hit_ratio = week_load_hit/week_load_total*100)
 week
 
-week_aggr <- week %>% select(week_nr, week_load_hit, week_load_lit) %>% unique
-week_aggr_long <- melt(week_aggr, id.vars = "week_nr")
+week_aggr <- week %>% select(week_nr, week_load_hit, week_load_lit, hit_ratio) %>% unique
+week_aggr_long <- melt(week_aggr, id.vars = c("week_nr", "hit_ratio"))
 
-ggplot(week_aggr_long, aes(fill = variable, y = value, x = week_nr)) +
-  geom_bar(position = "stack", stat = "identity")
+# display text only for hit
+week_aggr_long %<>%
+  mutate(hit_ratio = ifelse(variable == "week_load_hit", paste0(round(hit_ratio, 0), "% HIT"), paste0(100 - round(hit_ratio, 0), "% LIT")))
 
 
 ui <- fluidPage(
@@ -62,8 +63,9 @@ server <- function(input, output) {
   })
 
   output$plot1 <- renderPlot({
-    ggplot(week_aggr_long, aes(fill = variable, y = value, x = week_nr)) +
-      geom_bar(position = "stack", stat = "identity")
+    ggplot(week_aggr_long, aes(fill = variable, y = value, x = week_nr), label = hit_ratio) +
+      geom_bar(position = "stack", stat = "identity") +
+      geom_text(aes(label = hit_ratio), size = 3, position = position_stack(vjust = 0.5))
   })
 
   output$text <- renderUI({
@@ -72,3 +74,11 @@ server <- function(input, output) {
   })
 }
 shinyApp(ui, server)
+
+
+# volume, HIT, HIT Ratio, Consistency
+# LIT really LIT?
+# low TSS before HIT?
+# https://v1.nitrocdn.com/IAEZpQbHvRqkjIDrVgmeAoKybhOCdsVs/assets/static/optimized/rev-5423573/wp-content/uploads/2018/03/seiler-hierarchy-of-endurance-training-needs.jpg
+
+# 25 < Volume > 7
