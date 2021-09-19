@@ -1,7 +1,9 @@
+#https://github.com/danvk/dygraphs/blob/e9155b2c442bf69396d5a456c885f938d38d35da/src/plugins/legend.js#L193
 library(dygraphs)
 library(magrittr)
 library(datasets)
 library(shiny)
+library(shinyjs)
 library(xts)
 library(leaflet)
 
@@ -22,6 +24,9 @@ tail(track)
 track$distance %<>% round
 track$enhanced_altitude
 
+idx <- which("heart_rate" == names(track) | "enhanced_altitude" == names(track)| "speed" == names(track))
+qxts <- xts(track[, idx], order.by = track$time) #track$time
+
 
 has_na <- is.na(track_raw) %>% sum
 if(has_na) stop("NA in data")
@@ -36,20 +41,21 @@ if(has_na) stop("NA in data")
 # plot(track$speed)
 
 ui <- shinyUI(fluidPage(
+  useShinyjs(),
   sidebarLayout(
     sidebarPanel(
       checkboxInput("showgrid", label = "Show Grid", value = TRUE),
       hr(),
       div(strong("From: "), textOutput("from", inline = TRUE)),
       div(strong("To: "), textOutput("to", inline = TRUE)),
-      div(strong("Date clicked: "), textOutput("clicked", inline = TRUE)),
+      div(strong("Date: "), textOutput("clicked", inline = TRUE)),
       br(),
       uiOutput("create_seq"),
       br(),
       helpText("Click and drag to zoom in (double click to zoom back out).")
     ),
     mainPanel(
-      dygraphOutput("dygraph"),
+      div(id = "msvr", dygraphOutput("dygraph")),
       leafletOutput('trackmap')
     )
   )
@@ -64,6 +70,7 @@ server <- shinyServer(function(input, output, session) {
                            hr_updated_at = Sys.time() + 3, sub_seq = NULL, just_map_updated = FALSE,
                            seq_updated_at = Sys.time() + 3)
 
+  # onevent("mousemove", "msvr", function(event) print(event$offsetX))
 
   observeEvent(input$trackmap_bounds, {
     # print("UPDATETRy")
@@ -84,6 +91,7 @@ server <- shinyServer(function(input, output, session) {
   observeEvent(c(global$hr_updated_at, global$heart_range), {
     # req(global$hr_updated_at == TRUE)
     # print(global$hr_updated_at)
+
     from = req(input$dygraph_date_window[[1]])
     to = req(input$dygraph_date_window[[2]])
     from <- strptime(from, "%Y-%m-%dT%H:%M:%OSZ") + 2*3600
@@ -110,13 +118,16 @@ server <- shinyServer(function(input, output, session) {
     global$hr_updated_at <- Sys.time()
   })
 
-
   observeEvent(global$hr_updated_at, {
     hr_triggered <- global$hr_updated_at + 1 >= Sys.time()
     if(hr_triggered){
       print("da")
-      print(input$dygraph_date_window)
+      # print(input$dygraph_date_window)
       global$sub_track <- track_raw[global$heart_range, ]
+      lats <- global$sub_track$position_lat %>% range
+      longs <- global$sub_track$position_long %>% range
+      leafletProxy("trackmap", session) %>%
+        fitBounds(lng1 = longs[1], lng2 = longs[2], lat1 = lats[1], lat2 = lats[2])
       # global$hr_updated_at <- FALSE
     }else{
       print("njet")
@@ -129,6 +140,11 @@ server <- shinyServer(function(input, output, session) {
     iconWidth = 20, iconHeight = 20
   )
 
+  cycle_icon <- icons(
+    iconUrl = "https://w7.pngwing.com/pngs/873/319/png-transparent-bicycle-safety-cycling-cyclist-icon-text-bicycle-logo.png",
+    iconWidth = 20, iconHeight = 20
+  )
+
   observeEvent(c(global$hr_updated_at, input$choose_seq), {
 
     global$keep_time
@@ -137,10 +153,10 @@ server <- shinyServer(function(input, output, session) {
       # print(global$sub_seq[[input$choose_seq]] %>% length)
       global$sub_track <- track_raw[global$sub_seq[[input$choose_seq]], ]
 
-      print("kkllk")
-      print(input$choose_seq)
-      print(global$sub_seq)
-      print(global$sub_seq[[input$choose_seq]])
+      # print("kkllk")
+      # print(input$choose_seq)
+      # print(global$sub_seq)
+      # print(global$sub_seq[[input$choose_seq]])
 
       global$dy_track <- track_raw[1:length(track_raw$timestamp) %in% global$sub_seq[[input$choose_seq]], ]
     }
@@ -163,7 +179,6 @@ server <- shinyServer(function(input, output, session) {
     global$trigger_map_update
     isolate({
       # print("global$hr_updated_at223")
-      print("inside leaflet")
       lon <- track$lon %>% range(na.rm = TRUE)
       lat <- track$lat %>% range(na.rm = TRUE)
       # print(global$heart_range)
@@ -173,13 +188,20 @@ server <- shinyServer(function(input, output, session) {
       m <- leaflet() %>% addTiles()
 
       finish <- c(tail(track$lon, 1), tail(track$lat, 1))
-      map <- m %>% fitBounds(lon[1], lat[1], lon[2], lat[2]) %>%
+      m %>% fitBounds(lon[1], lat[1], lon[2], lat[2]) %>%
         addPolylines(data = track, lng = ~lon, lat = ~lat, layerId = "init_poly") %>%
         addMarkers(lng = finish[1], lat = finish[2], icon = target_icon)
 
-      return(map)
-
     })
+  })
+
+  observeEvent(input$mouse, {
+    req(input$mouse)
+    tr <- track[input$mouse$x, ]
+    leafletProxy("trackmap", session) %>%
+      removeMarker(layerId = "current_pos") %>%
+      addMarkers(lng = tr$position_long, lat = tr$position_lat, layerId = "current_pos", icon = cycle_icon)
+
   })
 
   output$create_seq <- renderUI({
@@ -210,7 +232,7 @@ server <- shinyServer(function(input, output, session) {
   })
 
   observeEvent(c(global$trigger_dygraph_update, global$map_updated_at), {
-    print(global$map_updated_at)
+    # print(global$map_updated_at)
     map_is_init <- !is.null(global$trackmap_bounds)
     req(map_is_init)
 
@@ -224,7 +246,7 @@ server <- shinyServer(function(input, output, session) {
     # print(manual_update)
     #   # req(manual_update == TRUE)
     isolate({
-      print("dss")
+      # print("dss")
       bounds <- global$trackmap_bounds
       # print(bounds)
       global$keep_time <- track_raw$lat < bounds$north & track_raw$lat > bounds$south &
@@ -245,7 +267,7 @@ server <- shinyServer(function(input, output, session) {
     req(global$seq_updated_at)
 
     if(global$just_map_updated){
-      print("need dygraph update")
+      # print("need dygraph update")
       global$trigger_dygraph_update <- rnorm(1)
     }
   })
@@ -259,17 +281,17 @@ server <- shinyServer(function(input, output, session) {
 
     global$trigger_dygraph_update
     print("keep time")
-    print(global$dy_track %>% length)
     isolate({
       track <- global$dy_track
-      print(str(track))
+      # print(str(track))
       track$speed %<>% as.numeric
       # df <- data.frame(x = track$time, y = track$speed) # toberemoved
-      idx <- which("heart_rate" == names(track) | "enhanced_altitude" == names(track)| "speed" == names(track))
-      qxts <- xts(track[, idx], order.by = track$time) #track$time
 
       dygraph(qxts, main = "Heart rate over time") %>%
-        dyAxis("y", label = "Heart rate", valueRange = c(50, 210)) %>%
+        dyAxis("y", label = "Heart rate", valueRange = c(50, 210), valueFormatter = "function(v, opts, seriesName, dygraph, row) {
+            Shiny.onInputChange('mouse', {'x': row, 'val': v})
+          	return v;
+          }") %>%
         dyAxis("y2", label = "altitude", independentTicks = TRUE) %>%
         dySeries("enhanced_altitude", axis = ('y2'), fillGraph = TRUE, color = "grey", strokeWidth = 1, strokePattern = "dashed") %>%
         dyLimit(hr_lit[1], color = "blue") %>%
@@ -282,18 +304,17 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$from <- renderText({
-    req(input$dygraph_date_window[[1]])
+    date_time <- strptime(req(input$dygraph_date_window[[1]]), "%Y-%m-%dT%H:%M:%OSZ") + 2*3600
+    strftime(date_time, "%H:%M:%OS")
   })
 
-  strptime("2021-09-07T04:43:04.000Z", "%Y-%m-%dT%H:%M:%OSZ") %>%
-    strptime("%H:%M:%OSZ")
-
   output$to <- renderText({
-    req(input$dygraph_date_window[[2]])
+    date_time <- strptime(req(input$dygraph_date_window[[2]]), "%Y-%m-%dT%H:%M:%OSZ") + 2*3600
+    strftime(date_time, "%H:%M:%OS")
   })
 
   output$clicked <- renderText({
-    strftime(req(input$dygraph_click$x))
+    strftime(req(input$dygraph_date_window[[1]]))
   })
 
   output$point <- renderText({
