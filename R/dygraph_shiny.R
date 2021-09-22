@@ -7,6 +7,8 @@ library(shinyjs)
 library(xts)
 library(leaflet)
 
+source(file = "R/gen_data.R")
+
 hr_max <- 190
 hr_lit <- c(124, 146, 162)
 
@@ -74,7 +76,9 @@ server <- shinyServer(function(input, output, session) {
     # print("UPDATETRy")
     # print(global$map_updated_at)
     # print(Sys.time())
-    if(Sys.time() > global$map_updated_at + 1){
+    seq_man_updated <- global$seq_updated_at + 1 >= Sys.time()
+    map_just_updated <- Sys.time() > global$map_updated_at + 1
+    if(map_just_updated & !seq_man_updated){
       # print("UPDATE")
       global$map_updated_at <- Sys.time()
     }
@@ -96,7 +100,8 @@ server <- shinyServer(function(input, output, session) {
 
   observeEvent(global$dy_updated_at, {
     dy_triggered <- global$dy_updated_at + 1 >= Sys.time()
-    if(dy_triggered){
+    map_manual_updated <- global$map_updated_at +1 >= Sys.time()
+    if(dy_triggered & !map_manual_updated){
       print("da")
       # print(input$dygraph_date_window)
       from = req(input$dygraph_date_window[[1]])
@@ -153,11 +158,11 @@ server <- shinyServer(function(input, output, session) {
 
   observeEvent(c(global$dy_updated_at, input$choose_seq), {
 
-    global$keep_time
+    # global$keep_time
 
     if(!is.null(global$sub_seq)){
       # print(global$sub_seq[[input$choose_seq]] %>% length)
-      global$sub_track <- track_raw[global$sub_seq[[input$choose_seq]], ]
+      global$highlight_track <- track_raw[global$sub_seq[[input$choose_seq]], ]
 
       # print("kkllk")
       # print(input$choose_seq)
@@ -176,7 +181,7 @@ server <- shinyServer(function(input, output, session) {
 
     if(!is.null(global$sub_seq)){
       leafletProxy("trackmap", session) %>%
-        addPolylines(data = global$sub_track, lng = ~lon, lat = ~lat, color = "green", layerId = "add_poly_sub")
+        addPolylines(data = global$highlight_track, lng = ~lon, lat = ~lat, color = "green", layerId = "add_poly_sub")
     }
 
   })
@@ -279,13 +284,35 @@ server <- shinyServer(function(input, output, session) {
   })
 
   observe({
-    global$dy_track <- track_raw[global$keep_time, ]
+    global$just_map_updated <- global$map_updated_at +1 >= Sys.time()
+    print("global$map_updated_at")
+    print(Sys.time())
+    print(global$map_updated_at)
+    if(global$just_map_updated){
+      global$dy_track <- track_raw[global$keep_time, ]
+      print("UPDATEEE")
+    }
+  })
+
+  # observe({
+  #   manual_update_map <- global$map_updated_at +1 >= Sys.time()
+  #   manual_dy_map <- global$dy_updated_at +1 >= Sys.time()
+  #   if(manual_update_map | manual_dy_map){
+  #     global$trigger_render_ui <- rnorm(1)
+  #   }
+  # })
+
+
+  observe({
+    req(global$highlight_track)
+    global$dy_track <- global$highlight_track
   })
 
 
   output$dygraph <- renderDygraph({
 
-    global$trigger_dygraph_update
+    # global$trigger_dygraph_update
+    global$dy_track
     print("keep time")
     isolate({
       track <- global$dy_track
@@ -293,6 +320,7 @@ server <- shinyServer(function(input, output, session) {
       track$speed %<>% as.numeric
       # df <- data.frame(x = track$time, y = track$speed) # toberemoved
 
+      qxts <- xts(track[, idx], order.by = track$time) #track$time
       dygraph(qxts, main = "Heart rate over time") %>%
         dyAxis("y", label = "Heart rate", valueRange = c(50, 210), valueFormatter = "function(v, opts, seriesName, dygraph, row) {
             Shiny.onInputChange('mouse', {'x': row, 'val': v})
