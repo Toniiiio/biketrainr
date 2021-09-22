@@ -44,8 +44,6 @@ ui <- shinyUI(fluidPage(
   useShinyjs(),
   sidebarLayout(
     sidebarPanel(
-      checkboxInput("showgrid", label = "Show Grid", value = TRUE),
-      hr(),
       div(strong("From: "), textOutput("from", inline = TRUE)),
       div(strong("To: "), textOutput("to", inline = TRUE)),
       div(strong("Date: "), textOutput("clicked", inline = TRUE)),
@@ -67,7 +65,7 @@ server <- shinyServer(function(input, output, session) {
   n <- track_raw %>% nrow
   global <- reactiveValues(track = track_raw, keep_time = rep(TRUE, n), heart_range = 1:n,
                            map_updated_at = Sys.time() + 3,
-                           hr_updated_at = Sys.time() + 3, sub_seq = NULL, just_map_updated = FALSE,
+                           dy_updated_at = Sys.time() + 3, sub_seq = NULL, just_map_updated = FALSE,
                            seq_updated_at = Sys.time() + 3)
 
   # onevent("mousemove", "msvr", function(event) print(event$offsetX))
@@ -87,10 +85,44 @@ server <- shinyServer(function(input, output, session) {
     global$trackmap_bounds <- input$trackmap_bounds
   })
 
+  # it has to have an update from graph window without having had a previous update from the map.
+  # one way would be to enforce there is a time window (e.g. x seconds) in which another update is forbidden.
+  # x has to be large enough to avoid having circular updates (leaflet and dygraph triggering each other), but
+  # small enough to allow user to make fast updates. --> Trying with 1 second.
+  observeEvent(input$dygraph_date_window, {
+    global$dy_updated_at <- Sys.time()
+  })
 
-  observeEvent(c(global$hr_updated_at, global$heart_range), {
-    # req(global$hr_updated_at == TRUE)
-    # print(global$hr_updated_at)
+
+  observeEvent(global$dy_updated_at, {
+    dy_triggered <- global$dy_updated_at + 1 >= Sys.time()
+    if(dy_triggered){
+      print("da")
+      # print(input$dygraph_date_window)
+      from = req(input$dygraph_date_window[[1]])
+      to = req(input$dygraph_date_window[[2]])
+      from <- strptime(from, "%Y-%m-%dT%H:%M:%OSZ") + 2*3600
+      to <- strptime(to, "%Y-%m-%dT%H:%M:%OSZ") + 2*3600
+
+      start <- which.min(abs(track_raw$time - from))
+      end <- which.min(abs(track_raw$time - to))
+      global$heart_range <- start:end
+
+      global$sub_track <- track_raw[global$heart_range, ]
+      lats <- global$sub_track$position_lat %>% range
+      longs <- global$sub_track$position_long %>% range
+      leafletProxy("trackmap", session) %>%
+        fitBounds(lng1 = longs[1], lng2 = longs[2], lat1 = lats[1], lat2 = lats[2])
+      # global$dy_updated_at <- FALSE
+    }else{
+      print("njet")
+    }
+
+  })
+
+  observeEvent(c(global$dy_updated_at, global$heart_range), {
+    # req(global$dy_updated_at == TRUE)
+    # print(global$dy_updated_at)
 
     from = req(input$dygraph_date_window[[1]])
     to = req(input$dygraph_date_window[[2]])
@@ -109,32 +141,6 @@ server <- shinyServer(function(input, output, session) {
     }
   })
 
-
-  # it has to have an update from graph window without having had a previous update from the map.
-  # one way would be to enforce there is a time window (e.g. x seconds) in which another update is forbidden.
-  # x has to be large enough to avoid having circular updates (leaflet and dygraph triggering each other), but
-  # small enough to allow user to make fast updates. --> Trying with 1 second.
-  observeEvent(input$dygraph_date_window, {
-    global$hr_updated_at <- Sys.time()
-  })
-
-  observeEvent(global$hr_updated_at, {
-    hr_triggered <- global$hr_updated_at + 1 >= Sys.time()
-    if(hr_triggered){
-      print("da")
-      # print(input$dygraph_date_window)
-      global$sub_track <- track_raw[global$heart_range, ]
-      lats <- global$sub_track$position_lat %>% range
-      longs <- global$sub_track$position_long %>% range
-      leafletProxy("trackmap", session) %>%
-        fitBounds(lng1 = longs[1], lng2 = longs[2], lat1 = lats[1], lat2 = lats[2])
-      # global$hr_updated_at <- FALSE
-    }else{
-      print("njet")
-    }
-
-  })
-
   target_icon <- icons(
     iconUrl = "https://cdn.icon-icons.com/icons2/817/PNG/512/thefreeforty_target_icon-icons.com_66342.png",
     iconWidth = 20, iconHeight = 20
@@ -145,7 +151,7 @@ server <- shinyServer(function(input, output, session) {
     iconWidth = 20, iconHeight = 20
   )
 
-  observeEvent(c(global$hr_updated_at, input$choose_seq), {
+  observeEvent(c(global$dy_updated_at, input$choose_seq), {
 
     global$keep_time
 
@@ -158,7 +164,7 @@ server <- shinyServer(function(input, output, session) {
       # print(global$sub_seq)
       # print(global$sub_seq[[input$choose_seq]])
 
-      global$dy_track <- track_raw[1:length(track_raw$timestamp) %in% global$sub_seq[[input$choose_seq]], ]
+      # global$dy_track <- track_raw[1:length(track_raw$timestamp) %in% global$sub_seq[[input$choose_seq]], ] might need this
     }
     just_sec_updated <- global$seq_updated_at + 1 >= Sys.time()
 
@@ -176,15 +182,11 @@ server <- shinyServer(function(input, output, session) {
   })
 
   output$trackmap = renderLeaflet({
-    global$trigger_map_update
+    # global$trigger_map_update
     isolate({
-      # print("global$hr_updated_at223")
+      # print("global$dy_updated_at223")
       lon <- track$lon %>% range(na.rm = TRUE)
       lat <- track$lat %>% range(na.rm = TRUE)
-      # print(global$heart_range)
-      # print(global$track %>% head)
-      # print(lon)
-      # print(lat)
       m <- leaflet() %>% addTiles()
 
       finish <- c(tail(track$lon, 1), tail(track$lat, 1))
@@ -266,8 +268,12 @@ server <- shinyServer(function(input, output, session) {
     # print(global$just_map_updated)
     req(global$seq_updated_at)
 
-    if(global$just_map_updated){
-      # print("need dygraph update")
+    just_sec_updated <- global$seq_updated_at + 1 >= Sys.time()
+    print("just_sec_updated")
+    dy_triggered <- global$dy_updated_at + 1 >= Sys.time()
+    print(dy_triggered)
+    if(global$just_map_updated & !dy_triggered){
+      print("need dygraph update")
       global$trigger_dygraph_update <- rnorm(1)
     }
   })
@@ -297,7 +303,6 @@ server <- shinyServer(function(input, output, session) {
         dyLimit(hr_lit[1], color = "blue") %>%
         dyLimit(hr_lit[2], color = "blue") %>%
         dyLimit(hr_lit[3], color = "blue") %>%
-        dyOptions(drawGrid = input$showgrid, fillAlpha = 0.05) %>%
         dyRangeSelector()
     })
 

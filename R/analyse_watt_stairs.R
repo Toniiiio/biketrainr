@@ -6,18 +6,17 @@ library(reshape2)
 source("R/gen_energy_data.R")
 source("R/load_from_strava.R")
 
-file_name <- "C:/Users/User11/Downloads/Morga.fit"
-file_name <- "C:/Users/User11/Downloads" %>%
-  {file.path(., list.files(.))} %>%
-  file.info() %>%
-  {rownames(.[which.max(.$atime), ])}
+# file_name <- "C:/Users/User11/Downloads/Morga.fit"
+# file_name <- "C:/Users/User11/Downloads" %>%
+#   {file.path(., list.files(.))} %>%
+#   file.info() %>%
+#   {rownames(.[which.max(.$atime), ])}
 
 
-intervall_file_names <- "C:/Users/User11/Downloads" %>%
+intervall_file_names <- "data" %>%
   {file.path(., list.files(.))} %>%
-  .[grepl(., pattern = ".fit")]
-#%>%
- # .[grepl(., pattern = "4_4|Intervall|Wahoo")]
+  .[grepl(., pattern = "4_4|Intervall|Wahoo")]
+  # .[grepl(., pattern = ".fit")]
 
 intervall_file_names
 
@@ -74,17 +73,25 @@ for(nr in seq(intervall_file_names)){
 
 }
 
-ord <- names(hrs_list) %>% as.numeric() %>%  as.Date() %>% order
+dates <- names(hrs_list) %>% as.numeric() %>%  as.Date()
+ord <- dates %>% order
 
 hr <- hrs_list[ord] %>% do.call(rbind, .)
 colnames(hr) <- c(0, 100, 130, 160, 190, 220, 230)
 hr <- data.frame(hr)
-hr$time <- rownames(hr) %>% as.numeric %>% as.Date()
+hr$time <- dates
 
 qxts <- xts(hr[, 1:7], order.by = hr$time)
-dygraph(qxts)
+exclude <- apply(qxts, 1, is.na) %>% apply(2, all) %>% which
+qxts <- qxts[-exclude, ]
+qxts$tss <- c(100)
 
+dygraph(qxts) %>%
+  dyEvent("2021-09-07", "Ende 2,5Wochen Trainingslager", labelLoc = "bottom") %>%
+  dyEvent("2021-09-18", "Frankfurt-Eschborn Rennen", labelLoc = "bottom") %>%
+  dySeries("tss", fillGraph = TRUE, color = "grey")
 
+qxts
 # Next workout: 4*310 Watt
 # Next workout: 3*(10 oder 13)*30/15 330/200 Watt
 
