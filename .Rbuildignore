@@ -1,2 +1,5 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
+^biketrainr\.Rcheck$
+^biketrainr.*\.tar\.gz$
+^biketrainr.*\.tgz$

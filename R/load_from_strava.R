@@ -1,14 +1,19 @@
+library(remotes)
 #remotes::install_github("grimbough/FITfileR")
 library(FITfileR)
 library(magrittr)
 library(tidyverse)
 
-# file_name <- "4_4min_Wahoo_Kickr_Core.fit"
+source("R/gen_energy_data.R")
+
+file_name <- "01_04_2022_Evening_Ride.fit"
+file_name <- "31_03_2022_Lunch.fit"
 # file_name <- "C:/Users/User11/Downloads" %>%
-#   {file.path(., list.files(.))} %>%
-#   file.info() %>%
-#   {rownames(.[which.max(.$atime), ])}
-# file_name
+file_name <- "data" %>%
+  {file.path(., list.files(.))} %>%
+  file.info() %>%
+  {rownames(.[which.max(.$atime), ])}
+file_name
 
 
 # keep <- strava_records %>%
@@ -36,11 +41,22 @@ load_strava <- function(file_name){
   amt_na <- apply(strava_data, 2, function(col) sum(is.na(col))) / dim(strava_data)[1]
   keep <- which(amt_na < 0.99)
   strava_data <- strava_data[, keep]
-
-  strava_data <- zoo::na.locf(strava_data)
   names(strava_data) <- gsub(pattern = "[.].*", replacement = "", x = names(strava_data))
+
+  # wahoo sometimes produces watt = 65535, see e.g. 2.4.22. Set as NA and replace by previous value, as other NAs
+  # have to be replaced anyway. The issue of 65535 could be if wahoo kickr does not get power from outlet, then 65535 are set.
+  strava_data$power[which(strava_data$power == 65535)] <- NA
+  strava_data <- zoo::na.locf(strava_data, na.rm = FALSE)
+  strava_data$power %>% summary
+
+  nas <- is.na(strava_data)
+  rmv <- which((rowSums(nas) / ncol(nas)) > 0.75) # remove incomplete lines - mostly first one.
+  strava_data <- strava_data[-rmv, ]
+
   strava_data %>% head
-  strava_data
+  strava_data$power %>% summary
+
+  return(strava_data)
 
   # keep <- strava_records %>%
   #   lapply(dim) %>%
@@ -53,7 +69,8 @@ load_strava <- function(file_name){
   # strava_data
 }
 
-# records <- load_strava(file_name)
+# file_name
+# records <- load_strava(paste0("data/", file_name))
 # head(records)
 
 
@@ -80,19 +97,6 @@ check_power <- function(records){
 # efficiency %>% mean
 
 
-used_carbs <- function(records){
-  avg_power <- records$power %>% mean
-  time <- records$timestamp %>%
-    range %>%
-    {difftime(time1 = .[2], time2 = .[1], units = "hours")} %>%
-    as.numeric
-
-  idx <- which(nrg$watt == round(avg_power))[1]
-  carbs <- nrg[idx, ]$carbs
-  time*carbs
-
-  records$power
-}
-
-# used_carbs(records)
-
+# file_name <- "data/03_04_2022.fit"
+# #"data/",
+# records <- load_strava(paste0(file_name))

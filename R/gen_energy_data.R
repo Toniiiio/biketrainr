@@ -4,12 +4,33 @@ library(leaflet.extras)
 library(dygraphs)
 
 energy <- data.frame(
-  watt = c(0, 100, 130, 160, 190, 220, 250, 280, 310),
-  hr = c(40, 111, 121, 129, 139, 150, 162, 175, 185),
-  kcal = c(76, 326, 423, 521, 619, 717, 814, 912, 1010),
-  carbs = c(5, 80, 98, 120, 136, 177, 218, 253, 277),
-  fat = c(15, 26, 26, 26, 26, 10, 5, 0, 0)
+  watt = c(0, 100, 130, 160, 190, 220, 250, 280, 310, 340, 370, 400, 430, 460, 490, 520),
+  hr = c(40, 111, 121, 129, 139, 150, 162, 175, 185, 192, 192, 192, 192, 192, 192, 192),
+  kcal = c(76, 326, 423, 521, 619, 717, 814, 912, 1010, 1110, 1210, 1310, 1410, 1510, 1610, 1710),
+  carbs = c(5, 80, 98, 120, 136, 177, 218, 253, 277, 302, 327, 352, 377, 402, 427, 452),
+  fat = c(0, 15, 15, 15, 19, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
 )
+
+df <- data.frame(watt = 1:520, fat = 0)
+df$fat[251:520] <- 0
+df$fat[100:160] <- 15
+df$fat[1:100] <- seq(0, 15, length.out = 100)
+df$fat[161:190] <- seq(19, 19, length.out = 30)
+df$fat[191:210] <- seq(19, 10, length.out = 20)
+df$fat[211:240] <- 10
+df$fat[241:250] <- seq(10, 0, length.out = 10)
+
+out <- rbind(
+  data.frame(watt = 0, fat = 0),
+  df
+)
+out
+
+
+# df <- data.frame(watt = 1:520)
+# for(nr in 1:520){
+#
+# }
 
 
 # y1 = a*x1 + b
@@ -46,7 +67,10 @@ calc_energy <- function(energy, start_idx){
 n <- nrow(energy) - 1
 energies <- lapply(1:n, calc_energy, energy = energy)
 nrg <- do.call(rbind, energies)
+nrg <- plyr::join(nrg, out, by = "watt")
+
 plot(nrg$carbs)
+plot(nrg$fat, type = "l")
 #
 # calc_energy(energy[1:2, ])
 # calc_energy(energy[2:3, ])

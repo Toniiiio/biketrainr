@@ -2,3 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+biketrainr.Rcheck/
+biketrainr*.tar.gz
+biketrainr*.tgz
