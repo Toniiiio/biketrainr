@@ -1,5 +1,6 @@
 library(remotes)
 #remotes::install_github("grimbough/FITfileR")
+# usethis::create_github_token()
 library(FITfileR)
 library(magrittr)
 library(tidyverse)
