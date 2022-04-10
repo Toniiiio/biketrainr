@@ -3,74 +3,78 @@ library(leaflet)
 library(leaflet.extras)
 library(dygraphs)
 
-energy <- data.frame(
-  watt = c(0, 100, 130, 160, 190, 220, 250, 280, 310, 340, 370, 400, 430, 460, 490, 520),
-  hr = c(40, 111, 121, 129, 139, 150, 162, 175, 185, 192, 192, 192, 192, 192, 192, 192),
-  kcal = c(76, 326, 423, 521, 619, 717, 814, 912, 1010, 1110, 1210, 1310, 1410, 1510, 1610, 1710),
-  carbs = c(5, 80, 98, 120, 136, 177, 218, 253, 277, 302, 327, 352, 377, 402, 427, 452),
-  fat = c(0, 15, 15, 15, 19, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
-)
-
-df <- data.frame(watt = 1:520, fat = 0)
-df$fat[251:520] <- 0
-df$fat[100:160] <- 15
-df$fat[1:100] <- seq(0, 15, length.out = 100)
-df$fat[161:190] <- seq(19, 19, length.out = 30)
-df$fat[191:210] <- seq(19, 10, length.out = 20)
-df$fat[211:240] <- 10
-df$fat[241:250] <- seq(10, 0, length.out = 10)
-
-out <- rbind(
-  data.frame(watt = 0, fat = 0),
-  df
-)
-out
-
-
-# df <- data.frame(watt = 1:520)
-# for(nr in 1:520){
-#
-# }
-
-
-# y1 = a*x1 + b
-# y2 = a*x2 + b
-# y1 = ax1 + y2 - ax2
-# (y1 - y2)/(x1 - x2)= a
-# b = y1 - a*x1
-
-
-# 0 -
-# carb = 5 + 0.7*carb/watt*watt
-
-energy$carbs[1:2]
-
-start_idx <- 1
-end_idx <- 5
-calc_energy <- function(energy, start_idx){
-  end_idx <- start_idx + 1
-  a = (energy$carbs[start_idx] - energy$carbs[end_idx])/(energy$watt[start_idx] - energy$watt[end_idx])
-  b = energy$carbs[start_idx] - a* energy$watt[start_idx]
-  carbs = a*energy$watt[start_idx]:energy$watt[end_idx] + b
-
-  a = (energy$hr[start_idx] - energy$hr[end_idx])/(energy$watt[start_idx] - energy$watt[end_idx])
-  b = energy$hr[start_idx] - a* energy$watt[start_idx]
-  hr = a*energy$watt[start_idx]:energy$watt[end_idx] + b
-
-  data.frame(
-    carbs = carbs,
-    hr = hr,
-    watt = energy$watt[start_idx]:energy$watt[end_idx]
+create_nrg <- function(){
+  energy <- data.frame(
+    watt = c(0, 100, 130, 160, 190, 220, 250, 280, 310, 340, 370, 400, 430, 460, 490, 520),
+    hr = c(40, 111, 121, 129, 139, 150, 162, 175, 185, 192, 192, 192, 192, 192, 192, 192),
+    kcal = c(76, 326, 423, 521, 619, 717, 814, 912, 1010, 1110, 1210, 1310, 1410, 1510, 1610, 1710),
+    carbs = c(5, 80, 98, 120, 136, 177, 218, 253, 277, 302, 327, 352, 377, 402, 427, 452),
+    fat = c(0, 15, 15, 15, 19, 10, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0)
   )
+
+  df <- data.frame(watt = 1:520, fat = 0)
+  df$fat[251:520] <- 0
+  df$fat[100:160] <- 15
+  df$fat[1:100] <- seq(0, 15, length.out = 100)
+  df$fat[161:190] <- seq(19, 19, length.out = 30)
+  df$fat[191:210] <- seq(19, 10, length.out = 20)
+  df$fat[211:240] <- 10
+  df$fat[241:250] <- seq(10, 0, length.out = 10)
+
+  out <- rbind(
+    data.frame(watt = 0, fat = 0),
+    df
+  )
+  out
+
+
+  # df <- data.frame(watt = 1:520)
+  # for(nr in 1:520){
+  #
+  # }
+
+
+  # y1 = a*x1 + b
+  # y2 = a*x2 + b
+  # y1 = ax1 + y2 - ax2
+  # (y1 - y2)/(x1 - x2)= a
+  # b = y1 - a*x1
+
+
+  # 0 -
+  # carb = 5 + 0.7*carb/watt*watt
+
+  energy$carbs[1:2]
+
+  start_idx <- 1
+  end_idx <- 5
+  calc_energy <- function(energy, start_idx){
+    end_idx <- start_idx + 1
+    a = (energy$carbs[start_idx] - energy$carbs[end_idx])/(energy$watt[start_idx] - energy$watt[end_idx])
+    b = energy$carbs[start_idx] - a* energy$watt[start_idx]
+    carbs = a*energy$watt[start_idx]:energy$watt[end_idx] + b
+
+    a = (energy$hr[start_idx] - energy$hr[end_idx])/(energy$watt[start_idx] - energy$watt[end_idx])
+    b = energy$hr[start_idx] - a* energy$watt[start_idx]
+    hr = a*energy$watt[start_idx]:energy$watt[end_idx] + b
+
+    data.frame(
+      carbs = carbs,
+      hr = hr,
+      watt = energy$watt[start_idx]:energy$watt[end_idx]
+    )
+  }
+
+  n <- nrow(energy) - 1
+  energies <- lapply(1:n, calc_energy, energy = energy)
+  nrg <- do.call(rbind, energies)
+  nrg <- plyr::join(nrg, out, by = "watt")
+
+  return(nrg)
 }
-
-n <- nrow(energy) - 1
-energies <- lapply(1:n, calc_energy, energy = energy)
-nrg <- do.call(rbind, energies)
-nrg <- plyr::join(nrg, out, by = "watt")
-
-plot(nrg$carbs)
-plot(nrg$fat, type = "l")
+#
+# plot(nrg$carbs)
+# plot(nrg$fat, type = "l")
 #
 # calc_energy(energy[1:2, ])
 # calc_energy(energy[2:3, ])
